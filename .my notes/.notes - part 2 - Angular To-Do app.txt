@@ -1,0 +1,852 @@
+Angular to-do app tutorial - Building Angular app
+https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Frameworks_libraries/Angular_todo_list_beginning
+
+--- Beginning our Angular todo list app ---
+At this point, we are ready to start creating our to-do list application using Angular.
+The finished application will display a list of to-do items and includes   editing  ,   deleting  , and   adding   features.
+In this article you will get to know your application structure, and work up to displaying a basic list of to-do items.
+
+--- The to-do application structure
+Like any web application, an Angular application has an   index.html   as the entry point. The   index.html   actually is the app's top level HTML template:
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- ... -->
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>
+
+Within the <body> tag, Angular uses a special element —   <app-root>   — to insert your   main component  , which in turn includes other components you create.
+Generally, you don't need to touch the index.html, and you mostly focus your work within specialized areas of your application called   components  .
+
+--- Organize your application with components
+Components are a central building block of Angular applications.
+This to-do application has  two  components — a component as a foundation for your application, and a component for handling to-do items.
+
+Each component is made up of a TypeScript class, HTML, and CSS.
+TypeScript   transpiles  , or   converts  , into JavaScript,
+which means that your application ultimately ends up in plain JavaScript but
+you have the convenience of using TypeScript's extended features and streamlined syntax.
+
+--- Dynamically change the UI with   *ngIf   and   *ngFor
+This tutorial also covers two important Angular   directives   for dynamically altering the structure of the DOM.
+  A directive   is like   a command   that you can use in your HTML     to affect change in your application.
+
+The first directive that this tutorial covers is Angular's iterator,   *ngFor  .
+
+-->   *ngFor   can dynamically create DOM elements based on items in an array.
+
+
+The second directive that you learn in this tutorial is   *ngIf  .
+
+-->   You can use   *ngIf   to   add   or   remove   elements from the DOM based on a condition.
+
+
+For example, if users want to edit an item in the to-do list, you can provide them with the means to edit the item.
+If they do not want to edit an item, you can remove the interface for editing.
+
+ ! Important ! : Tutorial was done using Angular version v17.
+                 In the current newest Angular version (v19) control flow is handled by   @for  and   @if  control blocks.
+                https://angular.dev/guide/templates/control-flow
+
+
+--- Share data between components
+In this to-do application, you configure your components to   share data  .
+To add new items to the to do list, the   main component   has to   send   the new item to the second component.
+This second component manages the items and takes care of editing, marking as done, and deleting individual items.
+
+You accomplish sharing data between Angular components with special decorators called   @Input()   and   @Output()  .	!!!
+You use these decorators   to specify that certain properties allow data to go into   or   out of a component.
+
+To use   @Output()  , you   raise an event   in one component so that the other component knows that there is data available.
+
+--- Define Item
+In the app directory, create a new file named   item.ts   with the following contents:
+
+export interface Item {
+  description: string;
+  done: boolean;
+}
+
+You won't use this file until later, but it is a good time to know and record your knowledge of what an   item  is.
+The   Item   interface creates an   item   object model    so that your application will understand what an item is.  !!!
+For this to-do list, an item is an object that has a description and can be marked done.
+
+--- Add logic to AppComponent
+Now that you know what an   item   is, you can give your application some items by adding them to the app.
+In   app.component.ts  , replace the contents with the following:
+
+import { Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+
+@Component({
+  standalone: true,
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
+  imports: [CommonModule],
+})
+export class AppComponent {
+  componentTitle = "My To Do List";
+
+  filter: "all" | "active" | "done" = "all";
+
+  allItems = [
+    { description: "eat", done: true },
+    { description: "sleep", done: false },
+    { description: "play", done: false },
+    { description: "laugh", done: false },
+  ];
+
+  get items() {
+    if (this.filter === "all") {
+      return this.allItems;
+    }
+    return this.allItems.filter((item) =>
+      this.filter === "done" ? item.done : !item.done
+    );
+  }
+}
+
+The first two lines are JavaScript imports. In this case they are importing Angular libraries.
+The @Component() decorator specifies metadata about the AppComponent. Here's some more information about the metadata we're using:
+
+- standalone:   Describe whether the component requires a NgModule or not. Your app   will directly manage template dependencies (  components, directives, etc.) using imports   when it's a   standalone  .
+
+- selector:     Tells you the   CSS selector   that you use in a template    to place   this component  . Here it is   'app-root'  .
+                In the   index.html  , within the body tag, the Angular CLI added   <app-root></app-root>   when generating your application.
+                You use all component selectors in the same way by adding them to other component HTML templates.
+
+- templateUrl:  Specifies the HTML file to associate with this component. Here it is, './app.component.html',
+
+- styleUrls:    Provides the location and name of the file for your styles that apply specifically to this component. Here it is './app.component.css'.
+
+- imports: Allows you to specify the   component's dependencies   that can be used within its template.
+
+The   filter   property is of type   union  , which means filter could have the value of    all  ,   active  , or    done  .	!!!
+ With the   union type  , if you make a typo in the value you assign to the filter property, TypeScript lets you know so that you can catch the bug early.
+
+This guide shows you how to add filtering in a later step, but you can also use a filter to show the default list of all the items.
+
+The   allItems   array contains the to-do items and whether they are done.
+The first item,  eat  , has a done value of   true  .
+
+The getter,   get items()  , retrieves the items from the   allItems   array if the filter is equal to   all  .		!!! getter
+Otherwise,   get items()   returns the   done   or   pending   items depending on how the user filters the view.
+The getter also establishes the name of the array as   items  , which you'll use in the next section.
+
+--- Add HTML to the AppComponent template
+To see the list of items in the browser, replace the contents of   app.component.html   with the following HTML:
+
+<div class="main">
+  <h1>{{ componentTitle }}</h1>
+  <h2>What would you like to do today?</h2>
+
+  <ul>
+    <li *ngFor="let item of items">{{item.description}}</li>    !!!!
+  </ul>
+</div>
+
+The <li> contains an   *ngFor  , a built-in Angular directive that    iterates over the items   in the items array.
+
+For each item,   *ngFor   creates   a new <li>  .
+The double curly braces that contain   item.description   instructs Angular to populate each <li> with the text of   each item's description  .
+
+In the browser, you should see the list of items as follows:
+
+My To Do List
+What would you like to do today?
+
+* eat
+* sleep
+* play
+* laugh
+
+--- Add items to the list
+A to-do list needs a way to add items, so let's get started.
+In   app.component.ts  , add the following method to the class after the   allItems   array:
+
+addItem(description: string) {
+  if (!description) return;
+
+  this.allItems.unshift({
+    description,
+    done: false
+  });
+}
+
+The   addItem()   method   takes an item that the user provides and adds it to the array when the user clicks the   Add   button.
+The   addItem()   method uses the array method   unshift()   to   add a new item to the beginning of the array   and   the top of the list.
+You could alternatively use   push()  , which would   add the new item to the  end  of the array   and the bottom of the list.
+
+To use the   addItem()   method, edit the HTML in the AppComponent template.
+In   app.component.html  , replace the <h2> with the following:
+
+<label for="addItemInput">What would you like to do today?</label>
+
+<input
+  #newItem
+  placeholder="add an item"
+  (keyup.enter)="addItem(newItem.value); newItem.value = ''"
+  class="lg-text-input"
+  id="addItemInput" />
+
+<button class="btn-primary" (click)="addItem(newItem.value)">Add</button>
+
+In the above HTML,   #newItem   is a   template variable  .				 template variables
+The   template variable   in this case uses the   <input> element   as its value.
+  Template variables   can be referred to anywhere in the component's template.
+
+When the user types a new item in the   <input> field   and presses   Enter  , the   addItem() method   adds the value to the   allItems array  .
+
+Pressing the   Enter   key also   resets the value of <input>   to an empty string.
+
+The   template variable   #newItem   is used    to access the value of the <input> element   in the template.        using template variable to access value from inmput field
+
+Instead of pressing the   Enter  key, the user can also click the   Add button  , which calls the same   addItem()   method.
+
+--- Summary
+By now you should have your basic list of to-dos displaying in your browser. That's great progress! Of course, we have a lot more to do.
+In the next article we will look at adding some styling to our application.
+
+
+--- Styling our Angular app ---
+
+Now that we've got our basic application structure set up and started displaying something useful, 
+let's switch gears and spend an article looking at how Angular handles    styling of applications.
+
+--- Adding some style to Angular
+The Angular CLI (command-line interface) generates two types of   style files  :
+
+-    Component styles   :   The Angular CLI gives each component   its own file   for styles.
+  The styles in this file apply   only   to its component.
+
+-    styles.css    :    In the   src   directory, the styles in this file apply     to your entire application    unless you specify styles at the component level.
+Depending on whether you are using a   CSS preprocessor  , the extension on your CSS files can vary.
+Angular supports plain CSS, SCSS, Sass, and Less.
+
+In src/styles.css, paste the following styles:
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.btn-wrapper {
+  /* flexbox */
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+.btn {
+  color: #000;
+  background-color: #fff;
+  border: 2px solid #cecece;
+  padding: 0.35rem 1rem 0.25rem 1rem;
+  font-size: 1rem;
+}
+
+.btn:hover {
+  background-color: #ecf2fd;
+}
+
+.btn:active {
+  background-color: #d1e0fe;
+}
+
+.btn:focus {
+  outline: none;
+  border: black solid 2px;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #000;
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1.3rem;
+  border: black solid 2px;
+  margin: 1rem 0;
+}
+
+.btn-primary:hover {
+  background-color: #444242;
+}
+
+.btn-primary:focus {
+  color: #000;
+  outline: none;
+  border: #000 solid 2px;
+  background-color: #d7ecff;
+}
+
+.btn-primary:active {
+  background-color: #212020;
+}
+
+The CSS in src/styles.css apply to the entire application, however, these styles don't affect everything on the page.
+The next step is to add styles that apply specifically to the AppComponent.
+
+In app.component.css, add the following styles:
+
+.main {
+  max-width: 500px;
+  width: 85%;
+  margin: 2rem auto;
+  padding: 1rem;
+  text-align: center;
+  box-shadow:
+    0 2px 4px 0 rgb(0 0 0 / 20%),
+    0 2.5rem 5rem 0 rgb(0 0 0 / 10%);
+}
+
+@media screen and (min-width: 600px) {
+  .main {
+    width: 70%;
+  }
+}
+
+label {
+  font-size: 1.5rem;
+  font-weight: bold;
+  display: block;
+  padding-bottom: 1rem;
+}
+
+.lg-text-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #000;
+  display: block;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.btn-wrapper {
+  margin-bottom: 2rem;
+}
+
+.btn-menu {
+  flex-basis: 32%;
+}
+
+.active {
+  color: green;
+}
+
+ul {
+  padding-inline-start: 0;
+}
+
+ul li {
+  list-style: none;
+}
+
+The last step is to revisit your browser and look at how the styling has updated. Things now make a bit more sense.
+
+--- Summary
+Now that our brief tour of styling in Angular is done with, let's return to creating our app functionality.
+In the next article we will create   a proper component for to-do items  , and make it so that you can   check,   edit, and   delete  to-do items.
+
+
+--- Creating an item component ---
+Components provide a way for you to organize your application.
+This article walks you through   creating a component to handle the   individual items   in the list, and adding   check  ,   edit  , and   delete   functionality.
+The Angular   event model   is covered here.
+
+--- Creating the new component
+At the command line, create a component named   item   with the following CLI command:
+
+ng generate component item              ng generate component [componentName]
+
+The   ng generate component   command creates a component and folder with the name you specify.
+Here, the folder and component name is item. You can find the item directory within the app folder:
+
+src/app/item
+├── item.component.css
+├── item.component.html
+├── item.component.spec.ts
+└── item.component.ts
+
+Just as with the   AppComponent  , the   ItemComponent   is made up of the following files:
+
+- item.component.html for HTML
+- item.component.ts for logic
+- item.component.css for styles
+- item.component.spec.ts for testing the component
+
+You can see a reference to the HTML and CSS files in the   @Component()   decorator metadata in   item.component.ts  .
+
+@Component({
+  selector: 'app-item',
+  standalone: true,
+  imports: [],
+  templateUrl: './item.component.html',
+  styleUrl: './item.component.css'
+})
+
+--- Add HTML for the ItemComponent
+The ItemComponent can take over the task of giving the user a way to check items off as done, edit them, or delete them.
+
+Add markup for managing items by replacing the placeholder content in   item.component.html   with the following:
+
+<div class="item">
+  <input
+    [id]="item.description"
+    type="checkbox"
+    (change)="item.done = !item.done"
+    [checked]="item.done" />
+  <label [for]="item.description">{{item.description}}</label>
+
+  <div class="btn-wrapper" *ngIf="!editable">
+    <button class="btn" (click)="editable = !editable">Edit</button>
+    <button class="btn btn-warn" (click)="remove.emit()">Delete</button>
+  </div>
+
+  <!-- This section shows only if user clicks Edit button -->
+  <div *ngIf="editable">
+    <input
+      class="sm-text-input"
+      placeholder="edit item"
+      [value]="item.description"
+      #editedItem
+      (keyup.enter)="saveItem(editedItem.value)" />
+
+    <div class="btn-wrapper">
+      <button class="btn" (click)="editable = !editable">Cancel</button>
+      <button class="btn btn-save" (click)="saveItem(editedItem.value)">
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+
+The first input is a checkbox so users can check off items when an item is complete.
+The double curly braces, {{}}, in the <label> for the checkbox signifies Angular's   interpolation  .
+Angular uses   {{item.description}}   to retrieve the description of the current   item   from the   items   array.
+The next section explains how components share data in detail.
+
+The next two buttons for editing and deleting the current item are within a   <div>  .
+On this <div> is an   *ngIf  , a built-in   Angular directive   that you can use    to dynamically change the structure of the DOM  .       *ngIf 
+This   *ngIf   means that if   editable   is   false  , this <div> is in the DOM.
+If   editable   is true  , Angular removes this <div> from the DOM.
+
+<div class="btn-wrapper" *ngIf="!editable">
+  <button class="btn" (click)="editable = !editable">Edit</button>
+  <button class="btn btn-warn" (click)="remove.emit()">Delete</button>	!!!
+</div>
+
+When a user clicks the   Edit   button, editable becomes true, which removes this <div> and its children from the DOM.
+If, instead of clicking   Edit  , a user clicks   Delete  , the   ItemComponent   raises an event that notifies the   AppComponent   of the deletion.	!!! remove.emit()
+
+An   *ngIf   is also on the next <div>, but is set to an editable value of true.
+In this case, if editable is true, Angular puts the   <div>   and its child   <input>   and   <button>   elements in the DOM.
+
+<!-- This section shows only if user clicks Edit button -->
+<div *ngIf="editable">
+  <input
+    class="sm-text-input"
+    placeholder="edit item"
+    [value]="item.description"
+    #editedItem
+    (keyup.enter)="saveItem(editedItem.value)" />
+
+  <div class="btn-wrapper">
+    <button class="btn" (click)="editable = !editable">Cancel</button>
+    <button class="btn btn-save" (click)="saveItem(editedItem.value)">
+      Save
+    </button>
+  </div>
+</div>
+
+With   [value]="item.description"   , the value of the <input>   is bound   to the description of the current item.   !!!! value bounding
+This binding makes the    item's description   the value of the   <input>  .
+So if the description is   eat  , the description is already in the <input>.
+This way, when the user edits the item, the value of the <input> is already eat.
+
+The   template variable  ,   #editedItem  , on the <input> means that    Angular stores whatever a user types in this <input>   in a variable called   editedItem  .   !!!  template variable
+The keyup event calls the saveItem() method and passes in the editedItem value if the user chooses to press enter instead of click Save.
+
+When a user clicks the   Cancel   button,   editable   toggles to false, which removes the input and buttons for editing from the DOM.
+When   editable is false  , Angular puts <div> with the Edit and Delete buttons back in the DOM.
+
+Clicking the   Save   button calls the   saveItem()   method. The saveItem() method takes the value from the #editedItem element and changes the item's description to editedItem.value string.
+
+--- Prepare the AppComponent
+In the next section, you will add code that relies on communication between the   AppComponent   and the   ItemComponent  .
+Add the following line near the top of the   app.component.ts   file to import the   Item  :
+
+import { Item } from "./item";
+import { ItemComponent } from "./item/item.component";
+
+Then, configure the AppComponent by adding the following to the same file's class:
+
+remove(item: Item) {
+  this.allItems.splice(this.allItems.indexOf(item), 1);
+}
+
+The   remove()   method uses the JavaScript  Array.splice()  method to remove one item at the indexOf the relevant item.
+In plain English, this means that the splice() method removes the item from the array.
+For more information on the splice() method, see the Array.prototype.splice() documentation.
+
+--- Add logic to ItemComponent
+To use the   ItemComponent   UI, you must add logic to the component such as functions, and ways for data to go in and out.
+In   item.component.ts  , edit the JavaScript imports as follows:
+
+import { Component, Input, Output, EventEmitter } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { Item } from "../item";
+
+The addition of   Input  ,   Output  , and   EventEmitter   allows   ItemComponent   to share data with   AppComponent  .
+By importing   Item  , the   ItemComponent   can understand what an item is.
+You can update the @Component to use CommonModule in app/item/item.component.ts so that we can use the ngIf directives:
+
+@Component({
+  selector: 'app-item',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './item.component.html',
+  styleUrl: './item.component.css',
+})
+
+Further down   item.component.ts  , replace the generated   ItemComponent   class with the following:
+
+export class ItemComponent {
+
+  editable = false;
+
+  @Input() item!: Item;
+  @Output() remove = new EventEmitter<Item>();
+
+  saveItem(description: string) {
+    if (!description) return;
+
+    this.editable = false;
+    this.item.description = description;
+  }
+}
+
+--- @Input and @Output Decorators
+
+  @Input   -->   Decorator that marks a class field as an   input property   and   supplies configuration metadata.
+                 The   input property   is bound to   a DOM property   in the template.
+                 During change detection, Angular   automatically updates   the data property with the DOM property's value.
+
+  @Output  -->   Decorator that marks a class field as an   output property   and   supplies configuration metadata.
+                 The   DOM property   bound to the   output property   is automatically updated during change detection.
+---
+
+The   editable   property helps toggle a section of the template where a user can edit an item.
+  editable   is the same property in the HTML as in the   *ngIf   statement,   *ngIf="editable"  .
+When you   use a property in the template  , you must also   declare it   in the class.
+
+@Input(),  @Output(),  and   EventEmitter   facilitate communication between your two components.
+
+An   @Input()   serves as a doorway for data to   come into   the component,
+
+and an   @Output()  acts as a doorway for data to   go out   of the component.
+
+An @Output() has to be of type   EventEmitter,   so that a component can   raise an event   when there's data ready to share with another component.
+
+Note: The   !   in the class's property declaration is called    a definite assignment assertion   .
+      This operator tells TypeScript that the   item  field is always initialized   and   not   undefined  ,
+      even when TypeScript cannot tell from the   constructor's definition  .
+      If this operator is not included in your code and you have   strict TypeScript compilation settings  , the app will fail to compile.
+
+Use   @Input()   to specify   that the value of a property can come from   outside   of the component.
+Use   @Output()   in conjunction with   EventEmitter   to specify that the value of a property   can leave   the component 
+so that another component can receive that data.
+
+The   saveItem()   method takes as an argument a   description   of type   string  .
+The description is the text that the user enters into the HTML <input> when editing an item in the list.
+This description is the same string from the <input> with the #editedItem template variable.
+
+If the user doesn't enter a value but clicks   Save  ,   saveItem()   returns nothing and does not update the description.
+If you didn't have this   if   statement, the user could click   Save   with nothing in the HTML <input>, and the description would become an empty string.
+
+If a user enters text and clicks save,   saveItem()   sets   editable   to false, which causes the   *ngIf   in the template
+to remove the edit feature and render the Edit and Delete buttons again.
+
+Though the application should compile at this point, you need to use the   ItemComponent   in   AppComponent   so you can see the new features in the browser.
+
+--- Use the ItemComponent in the AppComponent ---
+Including   one component within another   in the context of a   parent-child relationship   gives you the flexibility of using components wherever you need them.
+
+The   AppComponent   serves as   a shell   for the application where you can include   other components  .
+
+To use the   ItemComponent   in   AppComponent,   put the   ItemComponent selector   in the   AppComponent template.
+
+Angular specifies the   selector of a component   in the   metadata   of the   @Component()   decorator.
+In this example, we've defined the selector as   app-item   :
+
+@Component({
+  selector: 'app-item',
+  // ...
+
+To use the   ItemComponent   selector   within the   AppComponent  , you add the element,   <app-item>  ,
+which corresponds to the   selector   you defined for the component class to   app.component.html  .
+Replace the current unordered list <ul> in   app.component.html   with the following updated version:
+
+<h2>
+  {{items.length}}
+  <span *ngIf="items.length === 1; else elseBlock">item</span>
+  <ng-template #elseBlock>items</ng-template>
+</h2>
+
+<ul>
+  <li *ngFor="let i of items">
+    <app-item (remove)="remove(i)" [item]="i"></app-item>
+  </li>
+</ul>
+
+Change the imports in   app.component.ts   to include   ItemComponent   as well as   CommonModule  :
+
+@Component({
+  standalone: true,
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
+  imports: [CommonModule, ItemComponent],
+})
+
+The double curly brace syntax, {{}}, in the <h2> interpolates the length of the   items  array and displays the number.
+
+The <span> in the <h2> uses an   *ngIf   and   else   to determine whether the <h2> should say "item" or "items".
+If there is only a single item in the list, the <span> containing "item" displays.
+Otherwise, if the length of the items array is anything other than 1, the   <ng-template>  , which we've named   elseBlock  ,
+with the syntax   #elseBlock  , shows instead of the <span>.
+You can use Angular's   <ng-template>   when you don't want content to render by default.
+In this case, when the length of the items array is not 1, the   *ngIf   shows the   elseBlock   and not the <span>.
+
+The <li> uses Angular's   repeater directive,   *ngFor  , to iterate over all of the items in the   items   array.
+Angular's    *ngFor   like   *ngIf  , is another directive that helps you change the structure of the DOM while writing less code.
+For each item, Angular repeats the <li> and everything within it, which includes <app-item>.
+This means that for each item in the array, Angular creates another instance of <app-item>.
+For any number of items in the array, Angular would create that many <li> elements.
+
+You can use an   *ngFor   on other elements, too, such as <div>, <span>, or <p>, to name a few.
+
+The   AppComponent   has a   remove()   method for removing the item, which is   bound   to the   remove   property in the   ItemComponent  . 
+The   item   property in the   square brackets, [],   binds the value of   i   between the   AppComponent   and the   ItemComponent  .
+
+Now you should be able to edit and delete items from the list.
+When you   add or delete   items, the count of the items should also change.
+To make the list more user-friendly, add some styles to the   ItemComponent  .
+
+--- Add styles to ItemComponent ---
+You can use a component's style sheet to add styles specific to that component.
+The following CSS adds basic styles, flexbox for the buttons, and custom checkboxes.
+
+Paste the following styles into   item.component.css.
+
+item {
+  padding: 0.5rem 0 0.75rem 0;
+  text-align: left;
+  font-size: 1.2rem;
+}
+
+.btn-wrapper {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.btn {
+  /* menu buttons flexbox styles */
+  flex-basis: 49%;
+}
+
+.btn-save {
+  background-color: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.btn-save:hover {
+  background-color: #444242;
+}
+
+.btn-save:focus {
+  background-color: #fff;
+  color: #000;
+}
+
+.checkbox-wrapper {
+  margin: 0.5rem 0;
+}
+
+.btn-warn {
+  background-color: #b90000;
+  color: #fff;
+  border-color: #9a0000;
+}
+
+.btn-warn:hover {
+  background-color: #9a0000;
+}
+
+.btn-warn:active {
+  background-color: #e30000;
+  border-color: #000;
+}
+
+.sm-text-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid #555;
+  display: block;
+  box-sizing: border-box;
+  font-size: 1rem;
+  margin: 1rem 0;
+}
+
+/* Custom checkboxes
+Adapted from https://css-tricks.com/the-checkbox-hack/#custom-designed-radio-buttons-and-checkboxes */
+
+/* Base for label styling */
+[type="checkbox"]:not(:checked),
+[type="checkbox"]:checked {
+  position: absolute;
+  left: -9999px;
+}
+[type="checkbox"]:not(:checked) + label,
+[type="checkbox"]:checked + label {
+  position: relative;
+  padding-left: 1.95em;
+  cursor: pointer;
+}
+
+/* checkbox aspect */
+[type="checkbox"]:not(:checked) + label:before,
+[type="checkbox"]:checked + label:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.25em;
+  height: 1.25em;
+  border: 2px solid #ccc;
+  background: #fff;
+}
+
+/* checked mark aspect */
+[type="checkbox"]:not(:checked) + label:after,
+[type="checkbox"]:checked + label:after {
+  content: "\2713\0020";
+  position: absolute;
+  top: 0.15em;
+  left: 0.22em;
+  font-size: 1.3em;
+  line-height: 0.8;
+  color: #0d8dee;
+  transition: all 0.2s;
+  font-family: "Lucida Sans Unicode", "Arial Unicode MS", Arial;
+}
+/* checked mark aspect changes */
+[type="checkbox"]:not(:checked) + label:after {
+  opacity: 0;
+  transform: scale(0);
+}
+[type="checkbox"]:checked + label:after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* accessibility */
+[type="checkbox"]:checked:focus + label:before,
+[type="checkbox"]:not(:checked):focus + label:before {
+  border: 2px dotted blue;
+}
+
+--- Summary
+You should now have a styled Angular to-do list application that can add, edit, and remove items.
+The next step is to add   filtering  so that you can look at items that meet specific criteria
+
+--- Filtering our to-do items ---
+
+--- Our filtering code
+Filtering items builds on the   filter   property, which you previously added to   app.component.ts  :
+
+filter: 'all' | 'active' | 'done' = 'all';
+
+The default value for filter is   all  , but it can also be   active   or   done  .
+
+--- Adding filter controls
+
+In   app.component.html  , add the following HTML below the   Add   button but above the section that lists the items.
+In the following snippet, the existing sections in your HTML are in comments so you can see exactly where to put the buttons.
+
+<div class="btn-wrapper">
+  <button
+    class="btn btn-menu"
+    [class.active]="filter == 'all'"
+    (click)="filter = 'all'">
+    All
+  </button>
+
+  <button
+    class="btn btn-menu"
+    [class.active]="filter == 'active'"
+    (click)="filter = 'active'">
+    To Do
+  </button>
+
+  <button
+    class="btn btn-menu"
+    [class.active]="filter == 'done'"
+    (click)="filter = 'done'">
+    Done
+  </button>
+</div>
+
+Clicking the buttons changes the   filter   values, which determines the   items   that show as well as the styles that Angular applies to the active button.
+
+- If the user clicks the   All   button, all of the items show.
+- If the user clicks the   To do   button, only the items with a   done   value of   false   show.
+- If the user clicks the   Done   button, only the items with a   done   value of   true   show.
+
+A   class attribute binding  , using square brackets, [], controls the text color of the buttons.
+The   class binding  ,   [class.active]  , applies the   active   class when the value of filter matches the expression.
+For example, when the user clicks the   Done   button, which sets the filter value to   done  , the class binding expression of filter == 'done' evaluates to true.
+When the filter value is done, Angular applies the active class to the Done button to make the text color green.
+As soon as the user clicks on one of the other buttons, the value a filter is no longer done, so the green text color no longer applies.
+
+--- Summary
+That was quick! Since you already had the   filter   code in   app.component.ts  , all you had to do was edit the template in order to provide controls for filtering the items.
+Our next — and last — article looks at how to build your Angular app ready for production, and provides further resources to carry on your learning journey.
+
+--- Building your finished application ---
+Now that you are finished developing your application, you can run the Angular CLI build command.
+When you run the   build   command in your todo directory, your application compiles into an output directory named   dist/  .
+
+In the todo directory, run the following command at the command line:
+
+ng build -c production
+
+The CLI compiles the application and puts the output in a new   dist   directory.
+The    --configuration production  /  -c production     flag  with   ng build   gets rid of stuff you don't need for production.
+
+--- Deploying your application
+To deploy your application, you can copy the contents of the    dist/my-project-name    folder to your web server.
+Because these files are static, you can host them on any web server capable of serving files, such as:
+
+- Node.js
+- Java
+- .NET
+
+You can use any backend such as Firebase, Google Cloud, or App Engine.
+
+--- Host locally
+For fun, you can host the built app on your machine using   http-server   package by running following command after running a build:
+
+npx http-server ./dist/todo/browser/ -o  
+
+--- What's next
+At this point, you've built a basic application, but your Angular journey is just beginning. You can learn more by exploring the Angular documentation, such as:
+
+Tour of Heroes: An in-depth tutorial highlighting Angular features, such as using services, navigation, and getting data from a server.
+The Angular Components guides: A series of articles that cover topics such as lifecycle, component interaction, and view encapsulation.
+The Forms guides: Articles that guide you through building reactive forms in Angular, validating input, and building dynamic forms.
+
