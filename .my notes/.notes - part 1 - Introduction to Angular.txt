@@ -13,8 +13,10 @@ As a platform, Angular includes:
 
 When you build applications with Angular, you're taking advantage of a platform that can scale from single-developer projects to enterprise-level applications. 
 
+
 --- Angular CLI (Angular command line interface ) ---
 Before you start exploring the Angular platform, you should know about the   Angular CLI  .
+
 
 --- What is the Angular CLI? ---
 The Angular CLI is a   command-line interface tool   which allows you to scaffold, develop, test,
@@ -26,7 +28,8 @@ The Angular CLI makes a number of tasks easy.
 
 Here are some example commands that you'll use frequently:
 
---- Command ---	--- Description ---
+
+--- Command ---	--- Description ---                                         !!!!!
   ng build		Compiles an Angular app into an output directory.
 
   ng serve		Builds and serves your application, rebuilding on file changes.
@@ -40,9 +43,11 @@ Here are some example commands that you'll use frequently:
 You'll find the Angular CLI to be a valuable tool for building out your applications.
 ----
 
+
 --- What you'll build ---
 This tutorial series guides you through building   a to-do list application  .
 Via this application you'll learn how to use Angular to manage, edit, add, delete, and filter items.
+
 
 --- Prerequisites ---
 To install Angular on your local system, you need the following:
@@ -60,6 +65,7 @@ To download and install npm packages, you need an    npm package manager  .
 This guide uses the   npm client command line interface  , which is installed with Node.js by default  .
 To check that you have the npm client installed, run    npm -v   in a terminal window.
 
+
 --- What is   npm registry   (public nmp registry)? ---
 The public   npm registry   is a database of JavaScript packages   , each comprised of software and metadata.
 Open source developers and developers at companies use the npm registry   to contribute packages   to the entire community or members of their organizations,
@@ -67,12 +73,13 @@ Open source developers and developers at companies use the npm registry   to con
 
 Default registry:  https://registry.npmjs.org/
 
- useful commands:
+ useful commands:                                                                                                             !!!!!!!!
  - npm get registry                         --> get current packages registry
  - npm set registry <registry URL addres>   --> change packages registry (example: set custom company registry)
                                                 set default registry:   npm set registry https://registry.npmjs.org/
 
---- Creating an Angular application ---
+
+--- Creating an Angular application ---                                                                                       !!!!!!!!
 You can use the   Angular CLI ( command-line interface tool )   to run commands in your   terminal   
 for   generating,   building,   testing,   and   deploying   Angular applications.
 
@@ -80,22 +87,26 @@ To install the Angular CLI globally, run the following command in your terminal:
 
  ( npm set registry https://registry.npmjs.org/      set default registry / set custom registry )
 
-   npm install -g @angular/cli
+   npm install -g @angular/cli                                                                                                !!!!!!!!
+
 
 Angular CLI commands all start with   ng  , followed by what you'd like the CLI to do.
 
 Create a new directory where you want to build your app, and switch to the directory in the terminal.
 (use   command line   or   integreted command line   in VS Code - Powershell makes problems (admin rights))
 
+
 Then use the following   ng new   command (https://angular.dev/cli/new) to create   a new application called   todo   :
 
-   ng new todo --routing=false --style=css --ssr=false		( ng new [name][options] )   [--option=value]
+   ng new todo --routing=false --style=css --ssr=false		( ng new [name][options] )   [--option=value]                       !!!!!!!!
+
 
 The   ng new   command  creates a minimal starter Angular application.
 The additional flags,   --routing   and   --style  , and   --ssr   define how to handle navigation and styles in the application,
 and   configures server-side rendering  . This tutorial describes these features later in more detail.
 
 The first time you run   ng   , you may be asked if you want to enable terminal   autocompletion   and   analytics  .
+
 
 --- Autocompletion ---
 Autocompletion is convenient because pressing TAB while typing ng commands will show possible options and will autocomplete arguments.
@@ -107,15 +118,17 @@ If you already refused the prompt, it won't ask again. But you can run ng comple
 Setting up autocompletion configures your terminal, so pressing the <TAB> key while in the middle of typing will display various
 commands and options available to you. This makes it very easy to discover and use CLI commands without lots of memorization.
 
+
 --- Analytics ---
 Commands:
    ng analytics disable    --> disables analytics locally
    ng analytics disable -g --> disables analytic globally
 
+
 --- Running Angular application ---
 
-To run your todo application, navigate into your new project with the   cd   command and run   ng serve   :
-
+To run your todo application, navigate into your new project with the   cd   command and run   ng serve   :                  !!!!!!!!
+  
    cd todo
    ng serve		           ng serve [options]   --> builds and serves your application, rebuilding on file changes   [ --option=value ]
 
@@ -128,6 +141,7 @@ While   ng serve   is running, open a second terminal tab or terminal window to 
 
 If at any point you would like to stop serving your application,   press    Ctrl + C
 in the terminal that's running the   ng serve   command.
+
 
 --- Get familiar with your Angular application ---
 
@@ -152,7 +166,9 @@ Key files that the CLI (command-line interface) generates automatically are the 
                         You use this file when you want to define styles that    only apply to a specific component,
                         as opposed to your application overall.
 
+
 A component   in Angular is made up of   three   main parts —   the template  ,   styles,  and   the class.	                Angular Component parts
+
 
 For example,   app.component.ts, app.component.html, and app.component.css    together   constitute the   AppComponent.
 
@@ -165,11 +181,13 @@ Whenever you generate a component, the CLI creates these files in a directory wi
 
 To learn more about testing, see the Angular testing guide   -->  https://angular.dev/guide/testing
 
+
 --- The structure of an Angular application ---
 Angular is built with   TypeScript  .
   TypeScript   is   a superset  of JavaScript  meaning that any valid JavaScript is valid TypeScript.
 TypeScript offers   typing   and   a more concise syntax   than plain JavaScript,
 which gives you a tool for creating more maintainable code and minimizing bugs.
+
 
 --- Component decorator - @Component ---
 Components   are the building blocks of an Angular application.
@@ -188,6 +206,7 @@ The class is in a file with a name such as   feature.component.ts,  where   feat
 So, you could have files with names such as   header.component.ts,   signup.component.ts,   or   feed.component.ts. 
 
 You create a component with a @Component() decorator that has metadata that tells Angular where to find the HTML and CSS.
+
 
 -- Class Decorators --
 A Class Decorator is declared just before a class declaration.
@@ -217,8 +236,10 @@ function sealed(constructor: Function) {
   Object.seal(constructor);
   Object.seal(constructor.prototype);
 }
+
 --
 Typical component is as follows:
+
 
 import { Component } from "@angular/core";
 
@@ -233,11 +254,13 @@ export class ItemComponent {
   // code goes here
 }
 
+
 This component is called   ItemComponent,   and its   selector   is   app-item 
 
 You use   a selector   just like regular HTML tags   by placing it within other templates, i.e.   <app-item></app-item>  .
 
 When a selector is in a template,   the browser renders the template of that component   whenever an instance of the selector is encountered.
+
 
 This tutorial guides you through creating two components and using one within the other.
 
@@ -246,6 +269,7 @@ The names are the same simply because   a component is nothing but   a class   s
 
 Angular's component model offers strong encapsulation and an intuitive application structure.
 Components also make your application easier to unit test and can improve the overall readability of your code.
+
 
 --- The HTML template ---
 
@@ -297,6 +321,7 @@ When the application    loads the component and its template,   the browser sees
 
 <h1>To do application</h1>
 
+
 --- Styles
 A component can inherit global styles from the application's   styles.css   file   and   augment   or   override them   with its own styles.
 You can write   component-specific styles   directly   in the @Component() decorator or   specify the path   to a CSS file.
@@ -321,6 +346,7 @@ or  styleUrls   with   an array of strings   if there are   multiple CSS stylesh
 
 With   component-specific styles,   you can organize your CSS so that it is easily maintainable and portable.
 
+
 --- Standalone components
 It's recommended to   make components standalone   unless a project already makes use of   NgModules   (Angular modules) to organize code.
 This tutorial uses standalone components which are easier to start with.
@@ -339,6 +365,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./app.component.css'],
   imports: [CommonModule],
 })
+
 
 --- Summary
 That's it for your first introduction to Angular. At this point you should be set up and ready to build an Angular app,

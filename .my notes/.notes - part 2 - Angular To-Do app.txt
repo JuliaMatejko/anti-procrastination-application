@@ -1,10 +1,12 @@
 Angular to-do app tutorial - Building Angular app
 https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Frameworks_libraries/Angular_todo_list_beginning
 
+
 --- Beginning our Angular todo list app ---
 At this point, we are ready to start creating our to-do list application using Angular.
 The finished application will display a list of to-do items and includes   editing  ,   deleting  , and   adding   features.
 In this article you will get to know your application structure, and work up to displaying a basic list of to-do items.
+
 
 --- The to-do application structure
 Like any web application, an Angular application has an   index.html   as the entry point. The   index.html   actually is the app's top level HTML template:
@@ -22,14 +24,17 @@ Like any web application, an Angular application has an   index.html   as the en
 Within the <body> tag, Angular uses a special element —   <app-root>   — to insert your   main component  , which in turn includes other components you create.
 Generally, you don't need to touch the index.html, and you mostly focus your work within specialized areas of your application called   components  .
 
+
 --- Organize your application with components
 Components are a central building block of Angular applications.
 This to-do application has  two  components — a component as a foundation for your application, and a component for handling to-do items.
 
 Each component is made up of a TypeScript class, HTML, and CSS.
+
 TypeScript   transpiles  , or   converts  , into JavaScript,
 which means that your application ultimately ends up in plain JavaScript but
 you have the convenience of using TypeScript's extended features and streamlined syntax.
+
 
 --- Dynamically change the UI with   *ngIf   and   *ngFor
 This tutorial also covers two important Angular   directives   for dynamically altering the structure of the DOM.
@@ -63,6 +68,7 @@ You use these decorators   to specify that certain properties allow data to go i
 
 To use   @Output()  , you   raise an event   in one component so that the other component knows that there is data available.
 
+
 --- Define Item
 In the app directory, create a new file named   item.ts   with the following contents:
 
@@ -74,6 +80,7 @@ export interface Item {
 You won't use this file until later, but it is a good time to know and record your knowledge of what an   item  is.
 The   Item   interface creates an   item   object model    so that your application will understand what an item is.  !!!
 For this to-do list, an item is an object that has a description and can be marked done.
+
 
 --- Add logic to AppComponent
 Now that you know what an   item   is, you can give your application some items by adding them to the app.
