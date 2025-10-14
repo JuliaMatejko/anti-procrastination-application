@@ -1,4 +1,6 @@
-# Angular To-Do Application
+# Angular To-Do List Application
+![image](https://github.com/user-attachments/assets/20c576ec-036a-4826-b5c6-02378f3d1b30)
+
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.2.
 
