@@ -7,7 +7,8 @@
     placeholder="add an item"
     (keyup.enter)="addItem(newItem.value); newItem.value = ''"
     class="lg-text-input"
-    id="addItemInput" />
+    id="addItemInput"
+  />
 
   <button class="btn-primary" (click)="addItem(newItem.value)">Add</button>
 
@@ -15,34 +16,38 @@
     <button
       class="btn btn-menu"
       [class.active]="filter == 'all'"
-      (click)="filter = 'all'">
+      (click)="filter = 'all'"
+    >
       All
     </button>
-  
+
     <button
       class="btn btn-menu"
       [class.active]="filter == 'active'"
-      (click)="filter = 'active'">
+      (click)="filter = 'active'"
+    >
       To Do
     </button>
-  
+
     <button
       class="btn btn-menu"
       [class.active]="filter == 'done'"
-      (click)="filter = 'done'">
+      (click)="filter = 'done'"
+    >
       Done
     </button>
   </div>
 
   <h2>
-    {{items.length}}
-    <span *ngIf="items.length === 1; else elseBlock">item</span>
-    <ng-template #elseBlock>items</ng-template>
+    {{ items.length }}
+    <span>@if(items.length === 1){ item } @else { items }</span>
   </h2>
-  
+
   <ul>
-    <li *ngFor="let i of items">
+    @for(i of items; track i.description){
+    <li>
       <app-item (remove)="remove(i)" [item]="i"></app-item>
     </li>
+    }
   </ul>
 </div>

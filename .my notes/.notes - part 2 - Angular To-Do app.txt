@@ -367,7 +367,7 @@ The Angular   event model   is covered here.
 --- Creating the new component
 At the command line, create a component named   item   with the following CLI command:
 
-ng generate component item              ng generate component [componentName]
+    ng generate component item              ng generate component [componentName] !!!!
 
 The   ng generate component   command creates a component and folder with the name you specify.
 Here, the folder and component name is item. You can find the item directory within the app folder:
@@ -830,7 +830,7 @@ When you run the   build   command in your todo directory, your application comp
 
 In the todo directory, run the following command at the command line:
 
-ng build -c production
+    ng build -c production    !!!
 
 The CLI compiles the application and puts the output in a new   dist   directory.
 The    --configuration production  /  -c production     flag  with   ng build   gets rid of stuff you don't need for production.
